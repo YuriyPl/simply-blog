@@ -1,9 +1,9 @@
 package com.github.ypl.simplyblog.web.entry;
 
-import com.github.ypl.simplyblog.AuthUser;
 import com.github.ypl.simplyblog.model.Entry;
 import com.github.ypl.simplyblog.repository.EntryRepository;
 import com.github.ypl.simplyblog.service.EntryService;
+import com.github.ypl.simplyblog.web.auth.UserDetailsImpl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
@@ -48,9 +48,9 @@ public class EntryController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Entry> create(@AuthenticationPrincipal AuthUser authUser, @Valid @RequestBody Entry entry) {
-        log.info("create entry for user {}", authUser.id());
-        Entry created = entryService.save(authUser.id(), entry);
+    public ResponseEntity<Entry> create(@AuthenticationPrincipal UserDetailsImpl authUser, @Valid @RequestBody Entry entry) {
+        log.info("create entry for user {}", authUser.getId());
+        Entry created = entryService.save(authUser.getId(), entry);
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(REST_URL + "/{id}")
                 .buildAndExpand(created.getId()).toUri();
@@ -60,19 +60,19 @@ public class EntryController {
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Transactional
-    public void update(@AuthenticationPrincipal AuthUser authUser, @Valid @RequestBody Entry entry, @PathVariable int id) {
-        log.info("update {} for user {}", id, authUser.id());
+    public void update(@AuthenticationPrincipal UserDetailsImpl authUser, @Valid @RequestBody Entry entry, @PathVariable int id) {
+        log.info("update {} for user {}", id, authUser.getId());
         assureIdConsistent(entry, id);
-        entryRepository.checkBelong(id, authUser.id());
-        entryService.save(authUser.id(), entry);
+        entryRepository.checkBelong(id, authUser.getId());
+        entryService.save(authUser.getId(), entry);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Transactional
-    public void delete(@AuthenticationPrincipal AuthUser authUser, @PathVariable int id) {
-        log.info("delete {} for user {}", id, authUser.id());
-        Entry entry = entryRepository.checkBelong(id, authUser.id());
+    public void delete(@AuthenticationPrincipal UserDetailsImpl authUser, @PathVariable int id) {
+        log.info("delete {} for user {}", id, authUser.getId());
+        Entry entry = entryRepository.checkBelong(id, authUser.getId());
         entryRepository.delete(entry);
     }
 

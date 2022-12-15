@@ -1,9 +1,9 @@
 package com.github.ypl.simplyblog.web.entry;
 
-import com.github.ypl.simplyblog.AuthUser;
 import com.github.ypl.simplyblog.model.Comment;
 import com.github.ypl.simplyblog.repository.CommentRepository;
 import com.github.ypl.simplyblog.service.CommentService;
+import com.github.ypl.simplyblog.web.auth.UserDetailsImpl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -45,9 +45,9 @@ public class CommentController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Comment> create(
-            @AuthenticationPrincipal AuthUser authUser, @PathVariable int entryId, @Valid @RequestBody Comment comment) {
-        log.info("create for entry {} and user {}", entryId, authUser.id());
-        Comment created = commentService.save(authUser.id(), entryId, comment);
+            @AuthenticationPrincipal UserDetailsImpl authUser, @PathVariable int entryId, @Valid @RequestBody Comment comment) {
+        log.info("create for entry {} and user {}", entryId, authUser.getId());
+        Comment created = commentService.save(authUser.getId(), entryId, comment);
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(REST_URL + "/{id}")
                 .buildAndExpand(entryId, created.getId()).toUri();
@@ -57,9 +57,9 @@ public class CommentController {
     @DeleteMapping("/{id}")
     @Transactional
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@AuthenticationPrincipal AuthUser authUser, @PathVariable int entryId, @PathVariable int id) {
-        log.info("delete from entry {} and user {}", entryId, authUser.id());
-        Comment comment = commentRepository.checkBelong(id, entryId, authUser.id());
+    public void delete(@AuthenticationPrincipal UserDetailsImpl authUser, @PathVariable int entryId, @PathVariable int id) {
+        log.info("delete from entry {} and user {}", entryId, authUser.getId());
+        Comment comment = commentRepository.checkBelong(id, entryId, authUser.getId());
         commentRepository.delete(comment);
     }
 

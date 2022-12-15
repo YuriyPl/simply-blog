@@ -69,9 +69,9 @@ public class AdminUserController extends AbstractUserController {
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Transactional
-    public void setActive(@PathVariable int id, @RequestParam boolean isActive) {
-        log.info(isActive ? "activate {}" : "deactivate {}", id);
+    public void setActive(@PathVariable int id, @RequestParam boolean enable) {
+        log.info(enable ? "enable {}" : "disable {}", id);
         User user = repository.getExisted(id);
-        user.setActive(isActive);
+        user.setEnabled(enable);
     }
 }

@@ -6,7 +6,7 @@ import com.github.ypl.simplyblog.model.User;
 import com.github.ypl.simplyblog.util.JsonUtil;
 
 public class UserTestData {
-    public static final MatcherFactory.Matcher<User> USER_MATCHER = MatcherFactory.usingIgnoringFieldsComparator(User.class, "password", "entries", "comments");
+    public static final MatcherFactory.Matcher<User> USER_MATCHER = MatcherFactory.usingIgnoringFieldsComparator(User.class, "password", "entries", "comments", "tokens");
 
     public static int ADMIN_ID = 1;
     public static int USER_ID = 2;

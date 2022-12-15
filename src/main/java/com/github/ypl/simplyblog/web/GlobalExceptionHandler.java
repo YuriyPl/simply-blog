@@ -2,6 +2,7 @@ package com.github.ypl.simplyblog.web;
 
 import com.github.ypl.simplyblog.exception.AppException;
 import com.github.ypl.simplyblog.exception.DataConflictException;
+import com.github.ypl.simplyblog.exception.TokenRefreshException;
 import com.github.ypl.simplyblog.util.ValidationUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -47,6 +49,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<?> dataConflictException(WebRequest request, DataConflictException ex) {
         log.error("DataConflictException: {}", ex.getMessage());
         return createResponseEntity(request, ErrorAttributeOptions.of(MESSAGE), null, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<?> authenticationException(WebRequest request, BadCredentialsException ex) {
+        log.error("BadCredentialsException: {}", ex.getMessage());
+        return createResponseEntity(request, ErrorAttributeOptions.of(MESSAGE), null, HttpStatus.UNAUTHORIZED);
+    }
+
+
+    @ExceptionHandler(value = TokenRefreshException.class)
+    public ResponseEntity<?> handleTokenRefreshException(WebRequest request, TokenRefreshException ex) {
+        log.error("TokenRefreshException: {}", ex.getMessage());
+        return createResponseEntity(request, ErrorAttributeOptions.of(MESSAGE), ex.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 
     @NonNull

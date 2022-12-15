@@ -1,3 +1,9 @@
+ypl.app:
+  jwtSecret: yplSecretKey
+  jwtExpirationMs: 3600000
+  jwtRefreshExpirationMs: 86400000
+  limitOfTokensPerUser: 5
+
 spring:
   jpa:
     show-sql: true

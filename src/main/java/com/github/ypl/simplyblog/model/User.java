@@ -58,8 +58,8 @@ public class User extends AbstractBaseEntity {
     @Column(name = "registered", nullable = false, columnDefinition = "date default now()", updatable = false)
     private LocalDate registered = LocalDate.now();
 
-    @Column(name = "is_active", nullable = false, columnDefinition = "boolean default true")
-    private boolean isActive = true;
+    @Column(name = "enabled", nullable = false, columnDefinition = "boolean default true")
+    private boolean enabled = true;
 
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.EAGER)
@@ -78,6 +78,11 @@ public class User extends AbstractBaseEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private List<Comment> comments;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIgnore
+    private List<RefreshToken> tokens;
 
     public User(Integer id, String name, String email, String password, String description, Role... roles) {
         this(id, name, email, password, description, Arrays.asList(roles), Collections.emptyList(), Collections.emptyList());

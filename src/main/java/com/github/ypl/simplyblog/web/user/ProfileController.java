@@ -1,7 +1,7 @@
 package com.github.ypl.simplyblog.web.user;
 
-import com.github.ypl.simplyblog.AuthUser;
 import com.github.ypl.simplyblog.model.User;
+import com.github.ypl.simplyblog.web.auth.UserDetailsImpl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,7 +21,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.Optional;
 
 import static com.github.ypl.simplyblog.util.ValidationUtil.assureIdConsistent;
 import static com.github.ypl.simplyblog.util.ValidationUtil.checkNew;
@@ -35,8 +34,8 @@ public class ProfileController extends AbstractUserController {
     protected static final String REST_URL = "/api/v1/profile";
 
     @GetMapping
-    public ResponseEntity<User> get(@AuthenticationPrincipal AuthUser authUser) {
-        return ResponseEntity.of(Optional.of(authUser.getUser()));
+    public ResponseEntity<User> get(@AuthenticationPrincipal UserDetailsImpl authUser) {
+        return super.get(authUser.getId());
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -53,16 +52,16 @@ public class ProfileController extends AbstractUserController {
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Transactional
-    public void update(@Valid @RequestBody User user, @AuthenticationPrincipal AuthUser authUser) {
-        log.info("update {} with id={}", user, authUser.id());
-        assureIdConsistent(user, authUser.id());
+    public void update(@Valid @RequestBody User user, @AuthenticationPrincipal UserDetailsImpl authUser) {
+        log.info("update {} with id={}", user, authUser.getId());
+        assureIdConsistent(user, authUser.getId());
         prepareAndSave(user);
     }
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Transactional
-    public void delete(@AuthenticationPrincipal AuthUser authUser) {
-        super.delete(authUser.id());
+    public void delete(@AuthenticationPrincipal UserDetailsImpl authUser) {
+        super.delete(authUser.getId());
     }
 }

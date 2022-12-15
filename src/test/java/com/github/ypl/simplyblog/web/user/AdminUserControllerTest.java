@@ -165,19 +165,19 @@ public class AdminUserControllerTest extends AbstractControllerTest {
     @WithUserDetails(value = ADMIN_MAIL)
     void enable() throws Exception {
         perform(MockMvcRequestBuilders.patch(REST_URL + "/" + USER_ID)
-                .param("isActive", "false")
+                .param("enable", "false")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isNoContent());
 
-        assertFalse(repository.getExisted(USER_ID).isActive());
+        assertFalse(repository.getExisted(USER_ID).isEnabled());
     }
 
     @Test
     @WithUserDetails(value = ADMIN_MAIL)
     void enableNotFound() throws Exception {
         perform(MockMvcRequestBuilders.patch(REST_URL + "/" + NOT_FOUND)
-                .param("isActive", "false")
+                .param("enable", "false")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isUnprocessableEntity());

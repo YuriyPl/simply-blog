@@ -1,33 +1,34 @@
 package com.github.ypl.simplyblog.config;
 
-import com.github.ypl.simplyblog.AuthUser;
+import com.github.ypl.simplyblog.config.jwt.JwtAthFilter;
 import com.github.ypl.simplyblog.model.Role;
-import com.github.ypl.simplyblog.model.User;
-import com.github.ypl.simplyblog.repository.UserRepository;
+import com.github.ypl.simplyblog.service.UserDetailsServiceImpl;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import java.util.Optional;
-
-@Slf4j
 @AllArgsConstructor
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
     public static final PasswordEncoder PASSWORD_ENCODER = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
-    private final UserRepository userRepository;
+    private final UserDetailsServiceImpl userDetailsService;
+    private final JwtAthFilter jwtAthFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -35,31 +36,38 @@ public class SecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
-        return email -> {
-            log.debug("Authenticating '{}'", email);
-            Optional<User> optionalUser = userRepository.findByEmailIgnoreCase(email);
-            return new AuthUser(optionalUser.orElseThrow(
-                    () -> new UsernameNotFoundException("User '" + email + "' was not found")));
-        };
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf().disable()
+                .authorizeRequests()
+                .antMatchers(HttpMethod.POST, "/**/profile").anonymous()
+                .antMatchers("/**/profile").authenticated()
+                .antMatchers("/**/admin/**").hasRole(Role.ADMIN.name())
+                .antMatchers(HttpMethod.GET, "/**/entry/**").permitAll()
+                .antMatchers("/**/entry/**").authenticated()
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .exceptionHandling()
+                .and()
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(jwtAthFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling()
+                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
+        return http.build();
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/api/v1/profile").anonymous()
-                .antMatchers("/api/v1/profile").authenticated()
-                .antMatchers("/api/v1/admin/**").hasRole(Role.ADMIN.name())
-                .antMatchers(HttpMethod.GET, "/api/v1/entry/*").permitAll()
-                .antMatchers("/api/v1/entry/*").authenticated()
-                .antMatchers(HttpMethod.POST, "/api/v1/entry").authenticated()
-                .antMatchers(HttpMethod.GET, "/api/v1/entry/*/comments/*").permitAll()
-                .antMatchers("/api/v1/entry/*/comments/*").authenticated()
-                .antMatchers(HttpMethod.GET, "/api/v1/entry/*/comments").permitAll()
-                .antMatchers("/api/v1/entry/*/comments").authenticated()
-                .and().httpBasic()
-                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and().csrf().disable();
-        return http.build();
+    public AuthenticationProvider authenticationProvider() {
+        final DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        authenticationProvider.setUserDetailsService(userDetailsService);
+        authenticationProvider.setPasswordEncoder(passwordEncoder());
+        return authenticationProvider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 }
