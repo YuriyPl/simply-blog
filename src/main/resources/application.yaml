@@ -1,3 +1,9 @@
+ypl.app:
+  jwtSecret: yplSecretKey
+  jwtExpirationMs: 3600000
+  jwtRefreshExpirationMs: 86400000
+  limitOfTokensPerUser: 5
+
 spring:
   jpa:
     show-sql: true
@@ -23,8 +29,7 @@ spring:
 logging:
   level:
     root: WARN
-    com.github.ypl.simplyblog: DEBUG
-    org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver: DEBUG
+    com.github.ypl.simplyblog: INFO
 
 server.servlet:
   encoding:
