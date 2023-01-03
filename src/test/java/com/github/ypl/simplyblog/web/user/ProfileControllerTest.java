@@ -14,15 +14,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.github.ypl.simplyblog.web.user.ProfileController.REST_URL;
-import static com.github.ypl.simplyblog.web.user.UserTestData.ADMIN_MAIL;
-import static com.github.ypl.simplyblog.web.user.UserTestData.USER_ID;
-import static com.github.ypl.simplyblog.web.user.UserTestData.USER_MAIL;
-import static com.github.ypl.simplyblog.web.user.UserTestData.USER_MATCHER;
-import static com.github.ypl.simplyblog.web.user.UserTestData.admin;
-import static com.github.ypl.simplyblog.web.user.UserTestData.getNew;
-import static com.github.ypl.simplyblog.web.user.UserTestData.getUpdated;
-import static com.github.ypl.simplyblog.web.user.UserTestData.jsonWithPassword;
-import static com.github.ypl.simplyblog.web.user.UserTestData.user;
+import static com.github.ypl.simplyblog.web.user.UserTestData.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -122,6 +114,6 @@ public class ProfileControllerTest extends AbstractControllerTest {
     void delete() throws Exception {
         perform(MockMvcRequestBuilders.delete(REST_URL))
                 .andExpect(status().isNoContent());
-        USER_MATCHER.assertMatch(repository.findAll(), admin);
+        USER_MATCHER.assertMatch(repository.findAll(), admin, user2);
     }
 }

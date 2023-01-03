@@ -6,7 +6,8 @@ import com.github.ypl.simplyblog.model.User;
 import com.github.ypl.simplyblog.util.JsonUtil;
 
 public class UserTestData {
-    public static final MatcherFactory.Matcher<User> USER_MATCHER = MatcherFactory.usingIgnoringFieldsComparator(User.class, "password", "entries", "comments", "tokens");
+    public static final MatcherFactory.Matcher<User> USER_MATCHER =
+            MatcherFactory.usingIgnoringFieldsComparator(User.class, "password", "entries", "comments", "tokens", "confirmationTokens");
 
     public static int ADMIN_ID = 1;
     public static int USER_ID = 2;
@@ -16,6 +17,7 @@ public class UserTestData {
 
     public static User admin = new User(ADMIN_ID, "admin", ADMIN_MAIL, "admin123", "admin_description", Role.USER, Role.ADMIN);
     public static User user = new User(USER_ID, "user", USER_MAIL, "user123", "user_description", Role.USER);
+    public static User user2 = new User(3, "user2", "user2@gmail.com", "user2123", "user2_description", Role.USER);
 
     public static User getNew() {
         return new User(null, "newUser", "newemail@gmail.com", "12345uuihk", "blabla", Role.USER);
