@@ -1,5 +1,6 @@
 package com.github.ypl.simplyblog.web.user;
 
+import com.github.ypl.simplyblog.config.PassEncoder;
 import com.github.ypl.simplyblog.model.Role;
 import com.github.ypl.simplyblog.model.User;
 import com.github.ypl.simplyblog.repository.UserRepository;
@@ -9,10 +10,11 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.EnumSet;
 
-import static com.github.ypl.simplyblog.config.SecurityConfig.PASSWORD_ENCODER;
-
 @Slf4j
 public class AbstractUserController {
+
+    @Autowired
+    private PassEncoder passEncoder;
 
     @Autowired
     protected UserRepository repository;
@@ -33,7 +35,7 @@ public class AbstractUserController {
     }
 
     protected User prepareAndSave(User user) {
-        user.setPassword(PASSWORD_ENCODER.encode(user.getPassword()));
+        user.setPassword(passEncoder.passwordEncoder().encode(user.getPassword()));
         user.setEmail(user.getEmail().toLowerCase());
         return repository.save(user);
     }

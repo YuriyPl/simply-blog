@@ -84,8 +84,21 @@ public class User extends AbstractBaseEntity {
     @JsonIgnore
     private List<RefreshToken> tokens;
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIgnore
+    private List<ConfirmationToken> confirmationTokens;
+
     public User(Integer id, String name, String email, String password, String description, Role... roles) {
         this(id, name, email, password, description, Arrays.asList(roles), Collections.emptyList(), Collections.emptyList());
+    }
+
+    public User(String name, String email, String password, boolean enabled, Role... roles) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.enabled = enabled;
+        setRoles(Arrays.asList(roles));
     }
 
     public User(Integer id, String name, String email, String password, String description,

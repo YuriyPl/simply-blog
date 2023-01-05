@@ -11,19 +11,15 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
-import java.net.URI;
 
 import static com.github.ypl.simplyblog.util.ValidationUtil.assureIdConsistent;
-import static com.github.ypl.simplyblog.util.ValidationUtil.checkNew;
 import static com.github.ypl.simplyblog.web.user.ProfileController.REST_URL;
 
 @Slf4j
@@ -36,17 +32,6 @@ public class ProfileController extends AbstractUserController {
     @GetMapping
     public ResponseEntity<User> get(@AuthenticationPrincipal UserDetailsImpl authUser) {
         return super.get(authUser.getId());
-    }
-
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<User> register(@Valid @RequestBody User user) {
-        log.info("register {}", user);
-        checkNew(user);
-        User created = prepareAndSaveNewUser(user);
-        URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path(REST_URL).build().toUri();
-        return ResponseEntity.created(uriOfNewResource).body(created);
     }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
