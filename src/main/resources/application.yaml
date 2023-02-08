@@ -12,7 +12,7 @@ ypl.app:
 spring:
   jpa:
     show-sql: true
-    defer-datasource-initialization: true
+    defer-datasource-initialization: false
     hibernate:
       ddl-auto: update
     properties:
@@ -23,6 +23,12 @@ spring:
     url: jdbc:postgresql://localhost:5432/simplyblog_db
     username: postgres
     password: password
+
+  flyway:
+    url: jdbc:postgresql://localhost:5432/simplyblog_db
+    user: postgres
+    password: password
+    baselineOnMigrate: true
 
   mail:
     host: localhost
